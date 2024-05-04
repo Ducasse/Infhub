@@ -24,10 +24,10 @@ ICAddCategoryTest >> testSave [
 				yourself.
 	calendar addCategory: category.
 	savedCategory := calendar categories anyOne .
-	self assert: calendar categories size = 1.
-	self assert: savedCategory summary = 'greenpeace'.
-	self assert: savedCategory color = 'green'.
+	self assert: calendar categories size equals: 1.
+	self assert: savedCategory summary equals: 'greenpeace'.
+	self assert: savedCategory color equals: 'green'.
 	self assert: savedCategory textualDescription  
-				= 'this is a category for all greenpeace events'
+				equals: 'this is a category for all greenpeace events'
 
 ]

@@ -36,13 +36,13 @@ ICAppointmentTest >> testBasicInformation [
 
 	self assert: appointment summary equals: 'aTitle'.
 	appointment categories do: [ :each |
-		self assert: each class == ICCategory ].
-	self assert: appointment location = 'Bern'.
-	self assert: appointment textualDescription = 'description'.
-	self assert: appointment start class = self dateAndTimeClass.
+		self assert: each class equals: ICCategory ].
+	self assert: appointment location equals: 'Bern'.
+	self assert: appointment textualDescription equals: 'description'.
+	self assert: appointment start class equals: self dateAndTimeClass.
 	self assert: appointment start
 		> (self dateAndTimeClass year: 2005 month: 4 day: 18).
-	self assert: appointment end class = self dateAndTimeClass.
+	self assert: appointment end class equals: self dateAndTimeClass.
 	self assert:
 		appointment end
 		> (self dateAndTimeClass year: 2005 month: 4 day: 18)

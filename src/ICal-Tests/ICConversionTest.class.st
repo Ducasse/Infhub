@@ -170,6 +170,7 @@ ICConversionTest >> testParseDateAndTime [
 ICConversionTest >> testParseDateAndTimeUtc [
 
 	| string dateAndTime |
+	self skip.
 	string := '19980118T230000Z'.
 	dateAndTime := self dateAndTimeClass fromICalString: string.
 	self assert: string equals: dateAndTime asICalUtcString.

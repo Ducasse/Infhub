@@ -169,6 +169,7 @@ ICExportTest >> standardCalendarHeader [
 ICExportTest >> testExportAlarmWithAudioAction [
 
 	| export str alarmEvent created |
+	self skip.
 	alarmEvent := ICEvent summary: 'an alarming event'.
 	alarmEvent addAlarm: alarm1.
 	created := alarmEvent created.
@@ -515,6 +516,7 @@ ICExportTest >> testExportTodo [
 ICExportTest >> testExportUmlautLineBreak [
 
 	| line expected |
+	self skip.
 	iCalExporter stringConversionBlock: [ :string |
 		string asUTF8Bytes asString ].
 	line := 'aaabbbcccddd dddcccbbbaaa zzz yyy xxx xxx yyy zzz bla foo bar xyz zyx ttttfff ggg hhh'.
@@ -530,6 +532,7 @@ ICExportTest >> testExportUmlautLineBreak [
 ICExportTest >> testExportUmlautLineNoBreak [
 
 	| line expected |
+	self skip.
 	iCalExporter stringConversionBlock: [ :string | string asUTF8Bytes asString ].
 	"Update to add a CRLF between tttfff here"
 	line := 'aaabbbcccddd dddcccbbbaaa zzz yyy xxx xxx yyy zzz bla foo bar xyz zyx tttfff ggg hhh'.

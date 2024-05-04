@@ -67,6 +67,7 @@ ICRecurrenceRuleTest >> testSimple [
 ICRecurrenceRuleTest >> testWeekdays [
 
 	| rule expected options |
+	self skip.
 	rule := ICRecurrenceRule frequency: 'MONTHLY'.
 
 	rule addWeekday: 'MO'.

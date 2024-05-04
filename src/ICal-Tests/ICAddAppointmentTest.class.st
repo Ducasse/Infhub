@@ -39,10 +39,10 @@ ICAddAppointmentTest >> testSave [
 				yourself.
 	calendar addEvent: event.
 	savedEvent := calendar events first.
-	self assert: calendar events size = 1.
-	self assert: savedEvent location = 'bern'.
-	self assert: savedEvent categories anyOne = (ICCategory summary: 'first').
-	self assert: savedEvent summary = 'sleep'.
+	self assert: calendar events size equals: 1.
+	self assert: savedEvent location equals: 'bern'.
+	self assert: savedEvent categories anyOne equals: (ICCategory summary: 'first').
+	self assert: savedEvent summary equals: 'sleep'.
 	self assert: savedEvent isMediumPriority.
-	self assert: savedEvent textualDescription = 'because I''m always tired'.
+	self assert: savedEvent textualDescription equals: 'because I''m always tired'.
 ]
