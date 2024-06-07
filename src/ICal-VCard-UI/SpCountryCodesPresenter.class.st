@@ -3516,7 +3516,7 @@ SpCountryCodesPresenter >> initializeFlags [
 
 	| aFilename |
 	dictionaryImages := Dictionary new.
-	aFilename := 'C:\Users\addos\OneDrive\Documents\tiny'.
+	aFilename := 'tiny'.
 	aFilename asFileReference entries do: [ :entry |
 		dictionaryImages
 			at: (self asIdentifier: entry name)
