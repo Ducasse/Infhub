@@ -44,6 +44,13 @@ ICVCardMainPresenter >> contactList [
 	^ contactListPresenter 
 ]
 
+{ #category : 'initialization' }
+ICVCardMainPresenter >> contactsToolbar [
+	"This is a search and creator toolbar"
+
+	^ contactsToolbarPresenter
+]
+
 { #category : 'layout' }
 ICVCardMainPresenter >> defaultLayout [
 

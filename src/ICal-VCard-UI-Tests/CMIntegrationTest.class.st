@@ -1,23 +1,24 @@
 Class {
-	#name : 'CMIntegrationTests',
+	#name : 'CMIntegrationTest',
 	#superclass : 'TestCase',
 	#instVars : [
-		'contactManager'
+		'contactManager',
+		'app'
 	],
 	#category : 'ICal-VCard-UI-Tests',
 	#package : 'ICal-VCard-UI-Tests'
 }
 
 { #category : 'running' }
-CMIntegrationTests >> setUp [
+CMIntegrationTest >> setUp [
 
 	super setUp.
 	contactManager := ICVCardManager new.
-
+	app := ICVCardApp new.
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testAddContact [
+CMIntegrationTest >> testAddContact [
 
 	| nameContact |
 	nameContact := ICName new
@@ -37,76 +38,88 @@ CMIntegrationTests >> testAddContact [
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testContactDeletion [
+CMIntegrationTest >> testContactDeletion [
 
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testContactExport [
+CMIntegrationTest >> testContactExport [
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testContactGrouping [
-
-]
-
-{ #category : 'tests' }
-CMIntegrationTests >> testContactHistory [
-]
-
-{ #category : 'tests' }
-CMIntegrationTests >> testContactImport [
+CMIntegrationTest >> testContactGrouping [
 
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testContactMerge [
+CMIntegrationTest >> testContactHistory [
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testContactNotifications [
+CMIntegrationTest >> testContactImport [
+
+]
+
+{ #category : 'tests' }
+CMIntegrationTest >> testContactMerge [
+]
+
+{ #category : 'tests' }
+CMIntegrationTest >> testContactNotifications [
 	"Check that notifications related to contacts are appropriately triggered and handled within the contact manager"
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testContactOwnership [
+CMIntegrationTest >> testContactOwnership [
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testContactPermissions [
+CMIntegrationTest >> testContactPermissions [
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testContactSearch [
+CMIntegrationTest >> testContactSearch [
 
+	| searchText1 searchText2 searchPresenter presenter result |
+	presenter := app newPresenter: ICVCardMainPresenter.
+	presenter initializePresenters.
+	searchPresenter := presenter contactsToolbar.
+	
+	searchText1 := 'Sarah'.
+	result := searchPresenter filteredContactFor: searchText1.
+	self assert: result size equals: 0.
+	
+	searchText2 := 'john'.
+	result := searchPresenter filteredContactFor: searchText2.
+	self assert: result size equals: 1.
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testContactSharing [
-
-]
-
-{ #category : 'tests' }
-CMIntegrationTests >> testContactSorting [
-
-]
-
-{ #category : 'tests' }
-CMIntegrationTests >> testContactValidation [
-]
-
-{ #category : 'tests' }
-CMIntegrationTests >> testDuplicateContactPrevention [
-
-]
-
-{ #category : 'tests' }
-CMIntegrationTests >> testListContacts [
+CMIntegrationTest >> testContactSharing [
 
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testRemoveContact [
+CMIntegrationTest >> testContactSorting [
+
+]
+
+{ #category : 'tests' }
+CMIntegrationTest >> testContactValidation [
+]
+
+{ #category : 'tests' }
+CMIntegrationTest >> testDuplicateContactPrevention [
+
+]
+
+{ #category : 'tests' }
+CMIntegrationTest >> testListContacts [
+
+]
+
+{ #category : 'tests' }
+CMIntegrationTest >> testRemoveContact [
 	"Test removing a single contact in the contact manager"
 
 	| nameContact |
@@ -129,13 +142,13 @@ CMIntegrationTests >> testRemoveContact [
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testRetrieveContact [
+CMIntegrationTest >> testRetrieveContact [
 	"Test obtaining a contact object"
 
 ]
 
 { #category : 'tests' }
-CMIntegrationTests >> testUpdateContact [
+CMIntegrationTest >> testUpdateContact [
 
 
 ]
