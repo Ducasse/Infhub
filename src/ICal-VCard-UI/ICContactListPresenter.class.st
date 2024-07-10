@@ -49,9 +49,8 @@ ICContactListPresenter >> createNewContact [
 		birthday: contactPresenter birthday
 		phoneNumber2:
 		(icGenerator createPhoneNumber: contactPresenter phoneNumber2)
-		photo: (icGenerator photo: contactPresenter photo).
+		photo: (icGenerator photo: contactPresenter photo)
 
-	self vcardManager writeInSton   
 ]
 
 { #category : 'layout' }
@@ -65,9 +64,10 @@ ICContactListPresenter >> defaultLayout [
 { #category : 'initialization' }
 ICContactListPresenter >> emailAddressesFor: contact [
 
-	^ contact emailAddresses 
+	^ contact emailAddresses
 		  inject: String empty
-		  into: [ :acc :n | acc , ', ' , n address ]
+		  into: [ :acc :n | acc ifEmpty: [n address]
+			ifNotEmpty: [ acc,  ', ' , n address ]  ]
 ]
 
 { #category : 'operations' }
@@ -130,8 +130,9 @@ ICContactListPresenter >> items: aCollection [
 ICContactListPresenter >> phoneNumbersFor: contact [
 
 	^ contact phoneNumbers 
-		inject: String empty 
-		into: [ : acc : n | acc , ', ' , n number ]
+		  inject: String empty
+		  into: [ :acc :n | acc ifEmpty: [n number]
+			ifNotEmpty: [ acc,  ', ' , n number ]  ]
 ]
 
 { #category : 'operations' }

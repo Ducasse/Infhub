@@ -36,6 +36,13 @@ ICVCard class >> iCalType [
 	^'VCARD'
 ]
 
+{ #category : 'comparing' }
+ICVCard >> = anICVCard [
+
+	anICVCard class = self class ifFalse: [ ^ false ]
+	ifTrue: [ ^ anICVCard fullname = self fullname ] 
+]
+
 { #category : 'adding' }
 ICVCard >> addAddress: anAddress [
 	self addresses add: anAddress

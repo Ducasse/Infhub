@@ -50,6 +50,29 @@ ICContactPresenter >> birthday: aBirthday [
 ]
 
 { #category : 'layout' }
+ICContactPresenter >> checkName [
+	"  je veux verifier le nom et prenom du contact. 
+si c'est vide, alors on renvoie l'alerte. 
+si c'est pas vide, on vérifie si c'est bien ecrit.
+si c'est bien ecrit alors on peut save. sinon on lance l'alerte. "
+
+	(self name isEmptyOrNil and: [ self lastname isEmptyOrNil ])
+		ifFalse: [ ^self hasGoodName ]
+		ifTrue: [
+		self alert: 'Please write the contact''s name or lastname' ]
+]
+
+{ #category : 'layout' }
+ICContactPresenter >> checkPrincipalPhoneNumber [
+
+	self phoneNumber1 isEmptyOrNil
+		ifFalse: [ ^ self hasGoodPhoneNumber ]
+		ifTrue: [
+			self alert: 'Please write phone number for the contact'.
+			^ true ]
+]
+
+{ #category : 'layout' }
 ICContactPresenter >> defaultLayout [
 
 	^ SpBoxLayout newLeftToRight
@@ -98,23 +121,58 @@ ICContactPresenter >> email: anEmail [
 ]
 
 { #category : 'layout' }
+ICContactPresenter >> hasGoodName [
+
+	(self name asUnsignedInteger isNotNil or: [
+		 self lastname asUnsignedInteger isNotNil ])
+		ifTrue: [
+			self alert: 'You cannot have number in the name or lastname. 
+Please correct it.'.
+			^ true ]
+		ifFalse: [ ^ false ]
+]
+
+{ #category : 'layout' }
+ICContactPresenter >> hasGoodPhoneNumber [
+
+	self phoneNumber1 isAllDigits
+		ifFalse: [
+			self alert: 'You have letter(s) in the first phone number. 
+Please correct it.'.
+			^ true ]
+		ifTrue: [
+			self phoneNumber2 isNotEmpty ifTrue: [
+				self phoneNumber2 isAllDigits ifFalse: [
+					self alert: 'You have letter(s) in the second phone number. 
+Please correct it.'.
+					^ true ] ] ].
+
+	^ false
+]
+
+{ #category : 'layout' }
 ICContactPresenter >> initialExtentForWindow [
 
 	^ (600 @ 350) scaledByDisplayScaleFactor
 ]
 
 { #category : 'initialization' }
-ICContactPresenter >> initializeDialogWindow: aDialogPresenter [	
-	
+ICContactPresenter >> initializeDialogWindow: aDialogPresenter [
+
 	| cancelButton saveButton |
-	
 	aDialogPresenter centered.
-   cancelButton := aDialogPresenter addButton: 'Cancel' do: [ :presenter | presenter close ].
-   cancelButton icon: (self iconNamed: #smallCancel). "Appliquer le style visuel du bouton Cancel"
-    
-   saveButton := aDialogPresenter addButton: 'Save' do: [ :presenter | presenter beOk; close ].
-	saveButton icon: (self iconNamed: #smallOk).
-    
+	cancelButton := aDialogPresenter
+		                addButton: 'Cancel'
+		                do: [ :presenter | presenter close ].
+	cancelButton icon: (self iconNamed: #smallCancel). "Appliquer le style visuel du bouton Cancel"
+
+	saveButton := aDialogPresenter addButton: 'Save' do: [ :presenter |
+		              (self checkName "or: [ self checkPrincipalPhoneNumber ]")
+		              ifFalse: [
+			              presenter
+				              beOk;
+				              close ] ].
+	saveButton icon: (self iconNamed: #smallOk)
 ]
 
 { #category : 'initialization' }

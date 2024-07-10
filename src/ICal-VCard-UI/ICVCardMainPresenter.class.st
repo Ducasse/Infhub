@@ -69,6 +69,14 @@ ICVCardMainPresenter >> detailOfContact [
 ]
 
 { #category : 'initialization' }
+ICVCardMainPresenter >> importContact [
+
+	self contactList vcardManager importContact.
+	(self alert: 'Contact(s) imported')
+	
+]
+
+{ #category : 'initialization' }
 ICVCardMainPresenter >> initialExtentForWindow [
 
 	^ (840 @ 730) scaledByDisplayScaleFactor
@@ -136,6 +144,11 @@ ICVCardMainPresenter >> newCMToolbar [
 				   action: [ self contactList addContact ];
 				   yourself);
 		  add: (self newToolbarButton
+				   label: 'Import';
+				   icon: (self iconNamed: #glamorousInto);
+				   action: [ self importContact ];
+				   yourself);
+		  add: (self newToolbarButton
 				   label: 'Remove';
 				   icon: (self iconNamed: #smallDelete);
 				   action: [ self removeContact ];
@@ -145,12 +158,23 @@ ICVCardMainPresenter >> newCMToolbar [
 				   icon: (self iconNamed: #smallHelp);
 				   action: [ self openHelp ];
 				   yourself);
+				add: (self newToolbarButton
+				   label: 'Update';
+				   icon: (self iconNamed: #glamorousRefresh );
+				   action: [ self refresh ];
+				   yourself);
 		  add: (self newToolbarButton
 				   label: 'Quit';
 				   icon: (self iconNamed: #smallQuit);
 				   action: [ self delete ];
 				   yourself);
 		  yourself
+]
+
+{ #category : 'initialization' }
+ICVCardMainPresenter >> refresh [ 
+
+	self contactList updateItems  
 ]
 
 { #category : 'initialization' }

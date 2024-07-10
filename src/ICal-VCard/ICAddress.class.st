@@ -78,13 +78,17 @@ ICAddress class >> typePostal [
 { #category : 'converting' }
 ICAddress >> asString [
 
-	^ String streamContents: [ :stream |
-		  stream
-			  << self street asString;
-			  << $,;
-			  << self postalcode asString;
-			  << $,;
-				<< self locality asString ]
+	| x |
+	x := self street asString.
+	x := x , (self postalcode
+		      ifNotEmpty: [ ', ' , self postalcode ]
+		      ifEmpty: [ '' ]).
+	x := x
+	     ,
+	     (self locality
+		      ifNotEmpty: [ ', ' , self locality ]
+		      ifEmpty: [ '' ]).
+	^ x
 ]
 
 { #category : 'accessing' }
