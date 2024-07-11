@@ -77,8 +77,8 @@ ICCreateCalendarTest >> testCreatingSeveralCalendars [
 
 { #category : 'testing' }
 ICCreateCalendarTest >> testToDoList [
-	| calendar |
-		
+
+	| calendar |		
 	calendar := calendars
 		detect: [ :each | each name = 'veriveri''s Calendar' ]
 		ifNone: [nil].
@@ -90,6 +90,7 @@ ICCreateCalendarTest >> testToDoList [
 
 { #category : 'testing' }
 ICCreateCalendarTest >> testUser [
+
 	| newCalendar |
 	newCalendar := calendars 
 				detect: [:each | each name = 'veriveri''s Calendar']
