@@ -11,7 +11,8 @@ Class {
 	#superclass : 'SpPresenter',
 	#instVars : [
 		'contactList',
-		'contactPresenter'
+		'contactPresenter',
+		'icGenerator'
 	],
 	#category : 'ICal-VCard-UI-Spec',
 	#package : 'ICal-VCard-UI',
@@ -21,19 +22,35 @@ Class {
 { #category : 'operations' }
 ICContactListPresenter >> addContact [
 
+	| newContact |
+	icGenerator := ICVCardGenerator new.
 	contactPresenter := self instantiate: ICContactPresenter.
 	contactPresenter openModal isOk ifFalse: [ ^ self ].
 
-	self vcardManager
-		addContactName: contactPresenter name
-		lastname: contactPresenter lastname
-		phoneNumber1: contactPresenter phoneNumber1
-		address: contactPresenter address
-		email: contactPresenter email
-		birthday: contactPresenter birthday
-		phoneNumber2: contactPresenter phoneNumber2.
-		
+	newContact := self createNewContact.
 	self updateItems
+
+	
+]
+
+{ #category : 'operations' }
+ICContactListPresenter >> createNewContact [
+
+	self vcardManager
+		addContactName: (icGenerator createName: (ICName new
+					  givenName: contactPresenter name;
+					  familyName: contactPresenter lastname;
+					  yourself) asVCardString)
+		phoneNumber1:
+		(icGenerator createPhoneNumber: contactPresenter phoneNumber1)
+		address: (icGenerator createAddress:
+				 (ICAddress new street: contactPresenter address) asVCardString)
+		email: (icGenerator createEmailAddress: contactPresenter email)
+		birthday: contactPresenter birthday
+		phoneNumber2:
+		(icGenerator createPhoneNumber: contactPresenter phoneNumber2)
+		photo: (icGenerator photo: contactPresenter photo)
+
 ]
 
 { #category : 'layout' }
@@ -44,34 +61,43 @@ ICContactListPresenter >> defaultLayout [
 		  yourself
 ]
 
-{ #category : 'operations' }
-ICContactListPresenter >> initialExtentForWindow [ 
+{ #category : 'initialization' }
+ICContactListPresenter >> emailAddressesFor: contact [
 
- ^ (900 @ 100) scaledByDisplayScaleFactor 
+	^ contact emailAddresses
+		  inject: String empty
+		  into: [ :acc :n | acc ifEmpty: [n address]
+			ifNotEmpty: [ acc,  ', ' , n address ]  ]
+]
+
+{ #category : 'operations' }
+ICContactListPresenter >> initialExtentForWindow [
+
+	^ (840 @ 80) scaledByDisplayScaleFactor
 ]
 
 { #category : 'initialization' }
 ICContactListPresenter >> initializePresenters [
 
-	contactList := self newTable 
+	contactList := self newTable
 		               addColumn: (SpStringTableColumn new
 				                title: 'Fullname';
-				                evaluated: #fullname;
+				                evaluated: [ :e | e fullname ];
 				                yourself);
 		               addColumn: (SpStringTableColumn new
 				                title: 'Number(s)';
 				                evaluated: [ :contact |
-					                contact phoneNumbers joinUsing: ',' "collect: #phoneNumber" ];
+					                self phoneNumbersFor: contact ];
 				                yourself);
 		               addColumn: (SpStringTableColumn new
 				                title: 'Address';
 				                evaluated: [ :contact |
-					                contact addresses joinUsing: ',' "collect: #phoneNumber" ];
+					                contact addresses joinUsing: ',' ];
 				                yourself);
 		               addColumn: (SpStringTableColumn new
 				                title: 'Email';
 				                evaluated: [ :contact |
-					                contact emailAddresses joinUsing: ',' "collect: #address" ];
+					                self emailAddressesFor: contact ];
 				                yourself);
 		               addColumn: (SpStringTableColumn new
 				                title: 'Birthday';
@@ -100,6 +126,15 @@ ICContactListPresenter >> items: aCollection [
 	contactList items: aCollection
 ]
 
+{ #category : 'initialization' }
+ICContactListPresenter >> phoneNumbersFor: contact [
+
+	^ contact phoneNumbers 
+		  inject: String empty
+		  into: [ :acc :n | acc ifEmpty: [n number]
+			ifNotEmpty: [ acc,  ', ' , n number ]  ]
+]
+
 { #category : 'operations' }
 ICContactListPresenter >> removeContact [
 
@@ -123,7 +158,7 @@ ICContactListPresenter >> updateItems [
 ]
 
 { #category : 'operations' }
-ICContactListPresenter >> vcardManager [ 
+ICContactListPresenter >> vcardManager [
 
- ^ ICVCardManager uniqueInstance 
+		^ ICVCardManager uniqueInstance
 ]

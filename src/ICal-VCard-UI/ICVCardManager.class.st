@@ -26,7 +26,8 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'contacts',
-		'vcard'
+		'vcard',
+		'vcardGenerator'
 	],
 	#classVars : [
 		'UniqueInstance'
@@ -46,6 +47,13 @@ ICVCardManager class >> initialize [
 ]
 
 { #category : 'instance creation' }
+ICVCardManager class >> reset [
+	<script>
+	
+	UniqueInstance := nil
+]
+
+{ #category : 'instance creation' }
 ICVCardManager class >> uniqueInstance [
 
 	^ UniqueInstance ifNil: [ UniqueInstance := self basicNew ]
@@ -54,31 +62,23 @@ ICVCardManager class >> uniqueInstance [
 { #category : 'initialization' }
 ICVCardManager >> addContact: aContact [
 
-	self contacts add: aContact 
+	self contacts add: aContact.
+	self saveContactInSton
 ]
 
 { #category : 'adding' }
-ICVCardManager >> addContactName: aString lastname: aString2 phoneNumber1: aString3 address: aString4 email: aString5 birthday: aString6 phoneNumber2: aString7 [
+ICVCardManager >> addContactName: icName phoneNumber1: aString3 address: aString4 email: aString5 birthday: aString6 phoneNumber2: aString7 photo: aPicture [
 
-	"self addContact: (
-		ICVCard new
-			fullname: aString , ' ', aString2;
-			name: (ICName new familyName: aString2; givenName: aString);
-			addPhoneNumber: (ICPhoneNumber new number: aString3);
-			addAddress: (ICAddress fromVCardString: aString4 parameters: Dictionary new) ;
-			addEmailAddress: (ICEmailAddress new address: aString5);
-			birthday: aString6; 
-			yourself)"
-		
-	self addContact: (
-		ICVCard new
-			fullname: aString , ' ', aString2;
-			addPhoneNumber: aString3;
-			addPhoneNumber: aString7;
-			addAddress: aString4 ;
-			addEmailAddress: aString5 ;
-			birthday: aString6; 
-			yourself)
+	self addContact: (ICVCard new
+			 name: icName;
+			 addPhoneNumber: aString3;
+			 addPhoneNumber: aString7;
+			 addAddress: aString4;
+			 addEmailAddress: aString5;
+			 birthday: aString6;
+			 photo: aPicture;
+			 yourself).
+		self saveContactInSton
 ]
 
 { #category : 'accessing' }
@@ -87,10 +87,33 @@ ICVCardManager >> contacts [
 		ifNil: [ contacts := OrderedCollection new ]
 ]
 
+{ #category : 'actions' }
+ICVCardManager >> importContact [
+
+	| contactsImported file |
+	file := self selectFile.
+	contactsImported := OrderedCollection new.
+	(file extension = 'ston' ) ifTrue: [ contactsImported := self readContactSton:
+		                    (file asFileReference )].
+	
+
+	contactsImported do: [ :contact | self addContact: contact ]
+]
+
+{ #category : 'writing' }
+ICVCardManager >> readContactSton: aContactSton [
+
+	
+	^ STON reader
+		  on: aContactSton readStream;
+		  next
+]
+
 { #category : 'accessing' }
 ICVCardManager >> removeContact: anICVCard [
-	
-	self contacts remove: anICVCard 
+
+	self contacts remove: anICVCard.
+	self saveContactInSton 
 ]
 
 { #category : 'initialization' }
@@ -99,8 +122,26 @@ ICVCardManager >> reset [
 	UniqueInstance := nil.
 ]
 
-{ #category : 'accessing' }
-ICVCardManager >> vcard [ 
+{ #category : 'writing' }
+ICVCardManager >> saveContactInSton [
 
-	^ vcard 
+	'contacts.ston' asFileReference writeStreamDo: [ :stream |
+		STON writer
+			on: stream;
+			nextPut: (self contacts do: [ :each | each saveContactInSton ]) ] 
+]
+
+{ #category : 'accessing' }
+ICVCardManager >> selectFile [ 
+
+	| selectedFile |
+	((selectedFile := StOpenFilePresenter new openModal) notNil and: [
+		 selectedFile isFile ])
+	ifTrue: [ ^ selectedFile ]
+]
+
+{ #category : 'accessing' }
+ICVCardManager >> vcard [
+
+	^ vcard ifNil: [ vcard := ICVCard new ]
 ]

@@ -22,7 +22,7 @@ ICRemoveVCardCommand >> execute [
 		ifTrue: [ self contactManagerPresenter removeContact: self selectedContact ]
 ]
 
-{ #category : 'initialization' }
+{ #category : 'as yet unclassified' }
 ICRemoveVCardCommand >> initialize [
 	super initialize.
 	self

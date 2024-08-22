@@ -71,8 +71,8 @@ ParseSurendarTest >> testParseSurendarNotes [
 	self assert: cards size equals: 1.
 	card := cards anyOne.
 
-	self assert: card notes size equals: 1.
-	self assert: card notes anyOne equals: 'SMS message
+	self assert: card contacts size equals: 1.
+	self assert: card contacts anyOne equals: 'SMS message
 12/22/2003 18:12
 wassup
 

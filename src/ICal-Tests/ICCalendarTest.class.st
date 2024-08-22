@@ -127,7 +127,7 @@ ICCalendarTest >> testAddEvent [
 					minute: 1
 					second: 0);
 		addCategory: (ICCategory summary: 'first');
-		location: 'universitiy mensa'.
+		location: 'University mensa'.
 	newTodo := ICTodo summary: 'writing letters'.
 	newTodo
 		beLowPriority;
@@ -146,9 +146,9 @@ ICCalendarTest >> testAddEvent [
 	calendar
 		addEvent: newEvent;
 		addTodo: newTodo.
-	self assert: calendar todos size equals: (todoNumber + 1).
-	self assert: calendar events size equals: (totalEvents + 1).
-	self assert: calendar components size equals: (totalComponents + 2)
+	self assert: calendar todos size equals: todoNumber + 1.
+	self assert: calendar events size equals: totalEvents + 1.
+	self assert: calendar components size equals: totalComponents + 2
 ]
 
 { #category : 'testing' }
@@ -159,7 +159,7 @@ ICCalendarTest >> testAppointments [
 	size := 1.
 	self assert: calendar events size equals: size.
 	calendar addEvent: event2.
-	self assert: calendar events size equals: (size + 1).
+	self assert: calendar events size equals: size + 1.
 	calendar removeEvent: event1.
 	self assert: calendar events size equals: size.
 	calendar removeEvent: event2.
@@ -175,7 +175,7 @@ ICCalendarTest >> testCategories [
 	| size collection c1 c2 c3 |
 	size := 1.
 	calendar addCategory: category1.
-	self assert: calendar categories size equals: (size + 1).
+	self assert: calendar categories size equals: size + 1.
 	self assert: (calendar categoryWithSummary: 'personal') equals: category1.
 	calendar removeCategory: category1.
 	self assert: calendar categories size equals: size.
@@ -365,13 +365,13 @@ ICCalendarTest >> testRemoveEvent [
 	todoNumber := calendar todos size.
 	totalNumber := calendar components size.
 	calendar removeTodo: todo.
-	self assert: (calendar todos size) equals: (todoNumber - 1).
-	self assert: (calendar components size) equals: (totalNumber - 1).
-	self assert: (calendar events size) equals: eventNumber.
+	self assert: calendar todos size equals: todoNumber - 1.
+	self assert: calendar components size equals: totalNumber - 1.
+	self assert: calendar events size equals: eventNumber.
 	calendar removeEvent: event1.
-	self assert: (calendar todos size) equals: (todoNumber - 1).
-	self assert: (calendar events size) equals: (eventNumber - 1).
-	self assert: (calendar components size) equals: (totalNumber - 2)
+	self assert: calendar todos size equals: todoNumber - 1.
+	self assert: calendar events size equals: eventNumber - 1.
+	self assert: calendar components size equals: totalNumber - 2
 ]
 
 { #category : 'testing-events' }

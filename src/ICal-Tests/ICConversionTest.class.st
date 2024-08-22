@@ -308,16 +308,18 @@ Fooland'.
 ICConversionTest >> testParseStringOldEncodingAndSpaces [
 
 	| string value |
-	ICCalendarVersion use: 1.0 during: [
-		string := '123 Winding Way=0D=0A=' , String crlf
+	ICCalendarVersion 
+		use: 1.0 
+		during: [
+			string := '123 Winding Way=0D=0A=' , String crlf
 		          , ' Any Town, CA 12345=0D=0A=' , String crlf , ' USA'.
-		value := String fromOldString: (ICCalendarHandParser new unfold: string).
+			value := String fromOldString: (ICCalendarHandParser new unfold: string).
 		self assert: value equals: '123 Winding Way
 Any Town, CA 12345
 USA'.
-		self
-			assert: value asOldICalString
-			equals: '123 Winding Way=0D=0AAny Town\\, CA 12345=0D=0AUSA' ]
+			self
+				assert: value asOldICalString
+				equals: '123 Winding Way=0D=0AAny Town\\, CA 12345=0D=0AUSA' ]
 ]
 
 { #category : 'testing' }

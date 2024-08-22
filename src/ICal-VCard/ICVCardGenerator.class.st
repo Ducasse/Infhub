@@ -74,8 +74,23 @@ ICVCardGenerator >> contentline: aName parameters: aCollection value: aString [
 ]
 
 { #category : 'private' }
+ICVCardGenerator >> createAIMId: aString [ 
+
+	^ self
+		  createInstantMessageId: aString
+		  parameters: Dictionary new
+		  class: ICAIMId
+]
+
+{ #category : 'private' }
 ICVCardGenerator >> createAIMId: aString parameters: aDictionary [
 	^self createInstantMessageId: aString parameters: aDictionary class: ICAIMId
+]
+
+{ #category : 'private' }
+ICVCardGenerator >> createAddress: aString [ 
+
+	^ ICAddress fromVCardString: aString parameters: Dictionary new
 ]
 
 { #category : 'private' }
@@ -84,8 +99,23 @@ ICVCardGenerator >> createAddress: aString parameters: aDictionary [
 ]
 
 { #category : 'private' }
+ICVCardGenerator >> createEmailAddress: aString [ 
+
+	^ ICEmailAddress fromICalString: aString parameters: Dictionary new
+]
+
+{ #category : 'private' }
 ICVCardGenerator >> createEmailAddress: aString parameters: aDictionary [
 	^ICEmailAddress fromICalString: aString parameters: aDictionary
+]
+
+{ #category : 'private' }
+ICVCardGenerator >> createICQId: aString [ 
+
+	^ self
+		  createInstantMessageId: aString
+		  parameters: Dictionary new
+		  class: ICICQId
 ]
 
 { #category : 'private' }
@@ -110,6 +140,12 @@ ICVCardGenerator >> createMulitValue: aString parameters: aDictionary class: aCl
 ]
 
 { #category : 'private' }
+ICVCardGenerator >> createName: aString [
+
+	^ ICName fromICalString: aString parameters: Dictionary new
+]
+
+{ #category : 'private' }
 ICVCardGenerator >> createName: aString parameters: aDictionary [
 	^ICName fromICalString: aString parameters: aDictionary
 ]
@@ -117,6 +153,12 @@ ICVCardGenerator >> createName: aString parameters: aDictionary [
 { #category : 'private' }
 ICVCardGenerator >> createOrganization: aString parameters: aDictionary [
 	^ICOrganization fromICalString: aString parameters: aDictionary
+]
+
+{ #category : 'private' }
+ICVCardGenerator >> createPhoneNumber: aString [ 
+
+	^ ICPhoneNumber fromICalString: aString parameters: Dictionary new 
 ]
 
 { #category : 'private' }
@@ -224,9 +266,24 @@ ICVCardGenerator >> org:  aString parameters: aDictionary [
 ]
 
 { #category : 'processing-properties' }
-ICVCardGenerator >> photo:  aString parameters: aDictionary [
+ICVCardGenerator >> photo: aString [
+
 	| value |
-	value := self createValue: aString parameters: aDictionary default: ZnUrl iCalType.
+	value := self
+		         createValue: aString
+		         parameters: Dictionary new
+		         default: ZnUrl iCalType.
+	^ value
+]
+
+{ #category : 'processing-properties' }
+ICVCardGenerator >> photo: aString parameters: aDictionary [
+
+	| value |
+	value := self
+		         createValue: aString
+		         parameters: aDictionary
+		         default: ZnUrl iCalType.
 	self currentCard photo: value
 ]
 

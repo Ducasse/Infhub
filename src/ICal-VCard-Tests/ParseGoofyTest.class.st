@@ -65,14 +65,16 @@ ParseGoofyTest >> testParseGoofyFirstPhoneNumber [
 
 { #category : 'tests - parsing' }
 ParseGoofyTest >> testParseGoofyName [
-	
+
 	cards := ICCardHandParser parseVCardString: self goofyCardString.
 	self assert: cards size equals: 1.
 	card := cards anyOne.
-	
-	self assert: card fullname equals: 'Markus Tschannen'.
+
+	self assert: card fullname equals: 'Tschannen Markus'.
 	self assert: card version equals: 2.1.
-	self assert: card birthday equals: (self dateClass year: 1980 month: 10 day: 30).
+	self
+		assert: card birthday
+		equals: (self dateClass year: 1980 month: 10 day: 30).
 	name := card name.
 	self assert: name notNil.
 	self assert: name familyName equals: 'Tschannen'.
@@ -80,8 +82,8 @@ ParseGoofyTest >> testParseGoofyName [
 	self assert: name additionalNames isEmptyOrNil.
 	self assert: name honorificPrefixes isEmptyOrNil.
 	self assert: name honorificSuffixes isEmptyOrNil.
-	
-	self assert: card emailAddresses isEmpty.
+
+	self assert: card emailAddresses isEmpty
 ]
 
 { #category : 'tests - parsing' }

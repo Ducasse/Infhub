@@ -8,11 +8,12 @@ Class {
 	#name : 'ICVCardMainPresenter',
 	#superclass : 'SpPresenter',
 	#instVars : [
-		'contactList',
 		'statusBar',
 		'model',
-		'detailOfContact',
-		'contactPresenter'
+		'detailOfContactPresenter',
+		'contactPresenter',
+		'contactListPresenter',
+		'contactsToolbarPresenter'
 	],
 	#category : 'ICal-VCard-UI-Spec',
 	#package : 'ICal-VCard-UI',
@@ -38,17 +39,25 @@ ICVCardMainPresenter >> clickFilmAtIndex: anIndex [
 ]
 
 { #category : 'operations' }
-ICVCardMainPresenter >> contactList [ 
+ICVCardMainPresenter >> contactList [
 
-	^ contactList 
+	^ contactListPresenter 
+]
+
+{ #category : 'initialization' }
+ICVCardMainPresenter >> contactsToolbar [
+	"This is a search and creator toolbar"
+
+	^ contactsToolbarPresenter
 ]
 
 { #category : 'layout' }
 ICVCardMainPresenter >> defaultLayout [
 
 	^ SpBoxLayout newTopToBottom
-		  add: contactList;
-		  add: detailOfContact;
+		  add: contactsToolbarPresenter height: self toolbarHeight;
+		  add: contactListPresenter; 
+		  add: detailOfContactPresenter;
 		  add: statusBar expand: false;
 		  yourself
 ]
@@ -56,13 +65,21 @@ ICVCardMainPresenter >> defaultLayout [
 { #category : 'operations' }
 ICVCardMainPresenter >> detailOfContact [
 
-	^ detailOfContact 
+	^ detailOfContactPresenter 
 ]
 
 { #category : 'initialization' }
-ICVCardMainPresenter >> initialExtentForWindow [ 
+ICVCardMainPresenter >> importContact [
 
- ^ (900 @ 900) scaledByDisplayScaleFactor 
+	self contactList vcardManager importContact.
+	(self alert: 'Contact(s) imported')
+	
+]
+
+{ #category : 'initialization' }
+ICVCardMainPresenter >> initialExtentForWindow [
+
+	^ (840 @ 730) scaledByDisplayScaleFactor
 ]
 
 { #category : 'initialization' }
@@ -75,22 +92,31 @@ ICVCardMainPresenter >> initialize [
 { #category : 'initialization' }
 ICVCardMainPresenter >> initializeContactList [
 
-	contactList := self instantiate: ICContactListPresenter
+	contactListPresenter := self instantiate: ICContactListPresenter
+]
+
+{ #category : 'initialization' }
+ICVCardMainPresenter >> initializeContactsToolbar [
+	"This is a search and creator toolbar"
+
+	contactsToolbarPresenter := self
+		                         instantiate: ICSearchCreatePresenter 
+		                         on: self model
 ]
 
 { #category : 'initialization' }
 ICVCardMainPresenter >> initializeDetailOfContact [
 
-	detailOfContact := self instantiate: ICContactPresenter
+	detailOfContactPresenter := self instantiate: ICContactPresenter
 ]
 
 { #category : 'initialization' }
-ICVCardMainPresenter >> initializePresenters [ 
+ICVCardMainPresenter >> initializePresenters [
 
-	self initializeContactList .
+	self initializeContactList.
 	self initializeDetailOfContact.
-	statusBar := self newStatusBar.
-	
+	self initializeContactsToolbar.
+	statusBar := self newStatusBar
 ]
 
 { #category : 'initialization' }
@@ -103,6 +129,12 @@ ICVCardMainPresenter >> initializeWindow: aWindowPresenter [
 ]
 
 { #category : 'initialization' }
+ICVCardMainPresenter >> model [
+
+	^ self application vcardManager
+]
+
+{ #category : 'initialization' }
 ICVCardMainPresenter >> newCMToolbar [
 
 	^ self newToolbar
@@ -112,14 +144,24 @@ ICVCardMainPresenter >> newCMToolbar [
 				   action: [ self contactList addContact ];
 				   yourself);
 		  add: (self newToolbarButton
+				   label: 'Import';
+				   icon: (self iconNamed: #glamorousInto);
+				   action: [ self importContact ];
+				   yourself);
+		  add: (self newToolbarButton
 				   label: 'Remove';
 				   icon: (self iconNamed: #smallDelete);
-				   action: [ contactList removeContact ];
+				   action: [ self removeContact ];
 				   yourself);
 		  add: (self newToolbarButton
 				   label: 'Help';
 				   icon: (self iconNamed: #smallHelp);
 				   action: [ self openHelp ];
+				   yourself);
+				add: (self newToolbarButton
+				   label: 'Update';
+				   icon: (self iconNamed: #glamorousRefresh );
+				   action: [ self refresh ];
 				   yourself);
 		  add: (self newToolbarButton
 				   label: 'Quit';
@@ -130,9 +172,29 @@ ICVCardMainPresenter >> newCMToolbar [
 ]
 
 { #category : 'initialization' }
-ICVCardMainPresenter >> updateDetail: anICvcard [ 
+ICVCardMainPresenter >> refresh [ 
 
-	anICvcard ifNotNil: [detailOfContact model: anICvcard] 
+	self contactList updateItems  
+]
+
+{ #category : 'initialization' }
+ICVCardMainPresenter >> removeContact [
+
+	(self confirm: 'Are you sure you want to remove the contact ?')
+		ifFalse: [ ^ self ].
+	contactListPresenter removeContact
+]
+
+{ #category : 'layout' }
+ICVCardMainPresenter >> toolbarHeight [
+
+	^ self class toolbarHeight
+]
+
+{ #category : 'initialization' }
+ICVCardMainPresenter >> updateDetail: anICvcard [
+
+	anICvcard ifNotNil: [ detailOfContactPresenter updateModel: anICvcard ]
 ]
 
 { #category : 'initialization' }

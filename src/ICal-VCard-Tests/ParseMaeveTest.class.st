@@ -32,7 +32,7 @@ ParseMaeveTest >> testParseMaeveCategoriesAndNotes [
 	#('Friends' 'Columbia College Chicago' 'Family') do: [ :each |
 		self assert: (card categories anySatisfy: [ :cat | cat summary = each  ]) ].
 	
-	self assert: card notes isEmpty	
+	self assert: card contacts isEmpty	
 ]
 
 { #category : 'tests - parsing' }

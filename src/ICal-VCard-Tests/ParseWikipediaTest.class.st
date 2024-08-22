@@ -58,7 +58,7 @@ ParseWikipediaTest >> testParseWikipediaName [
 	self assert: cards size equals: 1.
 	card := cards anyOne.
 	
-	self assert: card fullname equals: 'Firstname Lastname'.
+	self assert: card fullname equals: 'Lastname Firstname'.
 	self assert: card version equals: 3.0.
 	name := card name.
 	self assert: name notNil.

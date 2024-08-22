@@ -57,7 +57,7 @@ ICVCardPhonePresenter >> text [
 { #category : 'initialization' }
 ICVCardPhonePresenter >> text: aText [ 
 
-	textField text: aText 
+	textField text: aText number asString
 ]
 
 { #category : 'initialization' }

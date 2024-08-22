@@ -174,7 +174,7 @@ ICVCardTest >> testICVCardAddNote [
 	note := 'Un nouveau contact'.
 	vcard addNote: note.
 
-	self assert: vcard notes first equals: 'Un nouveau contact'.
+	self assert: vcard contacts first equals: 'Un nouveau contact'.
 
 
 
