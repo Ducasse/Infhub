@@ -26,8 +26,7 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'contacts',
-		'vcard',
-		'vcardGenerator'
+		'vcard'
 	],
 	#classVars : [
 		'UniqueInstance'

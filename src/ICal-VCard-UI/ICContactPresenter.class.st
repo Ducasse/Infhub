@@ -51,25 +51,25 @@ ICContactPresenter >> birthday: aBirthday [
 
 { #category : 'layout' }
 ICContactPresenter >> checkName [
-	"  je veux verifier le nom et prenom du contact. 
-si c'est vide, alors on renvoie l'alerte. 
-si c'est pas vide, on vérifie si c'est bien ecrit.
-si c'est bien ecrit alors on peut save. sinon on lance l'alerte. "
+	" Answer <true> if the the name and surname of the contact is valid
+		If empty, alert and answer <false>.
+		If not empty, we check if it's written correctly."
 
-	(self name isEmptyOrNil and: [ self lastname isEmptyOrNil ])
-		ifFalse: [ ^self hasGoodName ]
-		ifTrue: [
-		self alert: 'Please write the contact''s name or lastname' ]
+	^ (self name isEmptyOrNil and: [ self lastname isEmptyOrNil ])
+		ifFalse: [ self hasGoodName ]
+		ifTrue: [ 
+			self alert: 'Please write the contact''s name or lastname'.
+			^ false ]
 ]
 
 { #category : 'layout' }
 ICContactPresenter >> checkPrincipalPhoneNumber [
 
-	self phoneNumber1 isEmptyOrNil
-		ifFalse: [ ^ self hasGoodPhoneNumber ]
+	^ self phoneNumber1 isEmptyOrNil
+		ifFalse: [ self hasGoodPhoneNumber ]
 		ifTrue: [
 			self alert: 'Please write phone number for the contact'.
-			^ true ]
+			true ]
 ]
 
 { #category : 'layout' }
@@ -120,7 +120,7 @@ ICContactPresenter >> email: anEmail [
 	emailTextPresenter text: anEmail address 
 ]
 
-{ #category : 'layout' }
+{ #category : 'testing' }
 ICContactPresenter >> hasGoodName [
 
 	(self name asUnsignedInteger isNotNil or: [
@@ -134,20 +134,12 @@ Please correct it.'.
 
 { #category : 'layout' }
 ICContactPresenter >> hasGoodPhoneNumber [
+	"Answer <true> if the receiver has a valid phone number"
 
-	self phoneNumber1 isAllDigits
-		ifFalse: [
-			self alert: 'You have letter(s) in the first phone number. 
-Please correct it.'.
-			^ true ]
-		ifTrue: [
-			self phoneNumber2 isNotEmpty ifTrue: [
-				self phoneNumber2 isAllDigits ifFalse: [
-					self alert: 'You have letter(s) in the second phone number. 
-Please correct it.'.
-					^ true ] ] ].
+	^ (self isValidPhoneNumber: self phoneNumber1) 
+		ifTrue: [ self isValidOptionalPhoneNumber: self phoneNumber2 ]
+		ifFalse: [ false ]
 
-	^ false
 ]
 
 { #category : 'layout' }
@@ -166,10 +158,11 @@ ICContactPresenter >> initializeDialogWindow: aDialogPresenter [
 		                do: [ :presenter | presenter close ].
 	cancelButton icon: (self iconNamed: #smallCancel). "Appliquer le style visuel du bouton Cancel"
 
-	saveButton := aDialogPresenter addButton: 'Save' do: [ :presenter |
-		              (self checkName "or: [ self checkPrincipalPhoneNumber ]")
-		              ifFalse: [
-			              presenter
+	saveButton := aDialogPresenter 
+		addButton: 'Save' 
+		do: [ :presenter | 
+			self validateNewContact ifTrue: [
+			    presenter
 				              beOk;
 				              close ] ].
 	saveButton icon: (self iconNamed: #smallOk)
@@ -198,6 +191,22 @@ ICContactPresenter >> initializeWindow: aWindowPresenter [
 	aWindowPresenter
 		title: 'Contact';
 		initialExtent: self initialExtentForWindow 
+]
+
+{ #category : 'testing' }
+ICContactPresenter >> isValidOptionalPhoneNumber: aPhoneNumberOrString [
+	"Answer <true> if the receiver has a valid optional phone number"
+
+	^ aPhoneNumberOrString isEmpty
+		ifTrue: [ true ]
+		ifFalse: [ aPhoneNumberOrString isAllDigits ]
+]
+
+{ #category : 'testing' }
+ICContactPresenter >> isValidPhoneNumber: aPhoneNumberOrString [
+	"Answer <true> if the receiver has a valid phone number"
+
+	^ aPhoneNumberOrString isNotEmpty and: [ aPhoneNumberOrString isAllDigits ]
 ]
 
 { #category : 'layout' }
@@ -266,7 +275,7 @@ ICContactPresenter >> picturePresenter: anObject [
 	picturePresenter := anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : 'private' }
 ICContactPresenter >> selectImage [
 
 	| selectedFile |
@@ -288,4 +297,11 @@ ICContactPresenter >> updateModel: anICvcard [
 	self phoneNumber1: firstNumber.
 	self phoneNumber2: secondNumber.
 	self picturePresenter image: anICvcard photo 
+]
+
+{ #category : 'testing' }
+ICContactPresenter >> validateNewContact [
+	"Answer <true> if the new contact information is valid"
+	
+	^ self checkName "or: [ self checkPrincipalPhoneNumber ]"
 ]

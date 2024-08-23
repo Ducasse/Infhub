@@ -13,7 +13,8 @@ Class {
 		'detailOfContactPresenter',
 		'contactPresenter',
 		'contactListPresenter',
-		'contactsToolbarPresenter'
+		'contactsToolbarPresenter',
+		'contactDetailsLabelPresenter'
 	],
 	#category : 'ICal-VCard-UI-Spec',
 	#package : 'ICal-VCard-UI',
@@ -45,7 +46,8 @@ ICVCardMainPresenter >> defaultLayout [
 
 	^ SpBoxLayout newTopToBottom
 		  add: contactsToolbarPresenter height: self toolbarHeight;
-		  add: contactListPresenter; 
+		  add: contactListPresenter;
+		  add: contactDetailsLabelPresenter expand: false;
 		  add: detailOfContactPresenter;
 		  add: statusBar expand: false;
 		  yourself
@@ -67,12 +69,6 @@ ICVCardMainPresenter >> importContact [
 			self alert: importCount asString , ' contact(s) imported' ]
 		ifNil: [ self inform: 'Cancelled' ]
 	
-]
-
-{ #category : 'initialization' }
-ICVCardMainPresenter >> initialExtentForWindow [
-
-	^ (840 @ 730) scaledByDisplayScaleFactor
 ]
 
 { #category : 'initialization' }
@@ -109,6 +105,10 @@ ICVCardMainPresenter >> initializePresenters [
 	self initializeContactList.
 	self initializeDetailOfContact.
 	self initializeContactsToolbar.
+	contactDetailsLabelPresenter := self newLabel 
+		label: 'Contact details'; 
+		addStyle: 'title';
+		yourself.
 	statusBar := self newStatusBar
 ]
 
@@ -117,7 +117,7 @@ ICVCardMainPresenter >> initializeWindow: aWindowPresenter [
 
 	aWindowPresenter
 		title: 'Contact Manager';
-		initialExtent: self initialExtentForWindow;
+		initialExtent: (840 @ 730) scaledByDisplayScaleFactor;
 		toolbar: self newCMToolbar
 ]
 
