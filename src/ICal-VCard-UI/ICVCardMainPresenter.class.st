@@ -13,23 +13,13 @@ Class {
 		'detailOfContactPresenter',
 		'contactPresenter',
 		'contactListPresenter',
-		'contactsToolbarPresenter'
+		'contactsToolbarPresenter',
+		'contactDetailsLabelPresenter'
 	],
 	#category : 'ICal-VCard-UI-Spec',
 	#package : 'ICal-VCard-UI',
 	#tag : 'Spec'
 }
-
-{ #category : 'commands' }
-ICVCardMainPresenter class >> buildCommandsGroupWith: presenter forRoot: rootCommandGroup [
-
-	rootCommandGroup
-		register:
-			((CmCommandGroup named: 'contact manager commands') asSpecGroup
-				register: ICAddVCardCommand forSpec;
-				register: ICRemoveVCardCommand forSpec;
-				yourself)
-]
 
 { #category : 'operations' }
 ICVCardMainPresenter >> clickFilmAtIndex: anIndex [
@@ -56,7 +46,8 @@ ICVCardMainPresenter >> defaultLayout [
 
 	^ SpBoxLayout newTopToBottom
 		  add: contactsToolbarPresenter height: self toolbarHeight;
-		  add: contactListPresenter; 
+		  add: contactListPresenter;
+		  add: contactDetailsLabelPresenter expand: false;
 		  add: detailOfContactPresenter;
 		  add: statusBar expand: false;
 		  yourself
@@ -68,18 +59,16 @@ ICVCardMainPresenter >> detailOfContact [
 	^ detailOfContactPresenter 
 ]
 
-{ #category : 'initialization' }
+{ #category : 'callbacks' }
 ICVCardMainPresenter >> importContact [
 
-	self contactList vcardManager importContact.
-	(self alert: 'Contact(s) imported')
+	self selectFile 
+		ifNotNil: [ : fileSelection | 
+			| importCount |
+			importCount := self processimportContactsFileSelection: fileSelection.
+			self alert: importCount asString , ' contact(s) imported' ]
+		ifNil: [ self inform: 'Cancelled' ]
 	
-]
-
-{ #category : 'initialization' }
-ICVCardMainPresenter >> initialExtentForWindow [
-
-	^ (840 @ 730) scaledByDisplayScaleFactor
 ]
 
 { #category : 'initialization' }
@@ -116,6 +105,10 @@ ICVCardMainPresenter >> initializePresenters [
 	self initializeContactList.
 	self initializeDetailOfContact.
 	self initializeContactsToolbar.
+	contactDetailsLabelPresenter := self newLabel 
+		label: 'Contact details'; 
+		addStyle: 'title';
+		yourself.
 	statusBar := self newStatusBar
 ]
 
@@ -124,11 +117,11 @@ ICVCardMainPresenter >> initializeWindow: aWindowPresenter [
 
 	aWindowPresenter
 		title: 'Contact Manager';
-		initialExtent: self initialExtentForWindow;
+		initialExtent: (840 @ 730) scaledByDisplayScaleFactor;
 		toolbar: self newCMToolbar
 ]
 
-{ #category : 'initialization' }
+{ #category : 'accessing' }
 ICVCardMainPresenter >> model [
 
 	^ self application vcardManager
@@ -171,6 +164,13 @@ ICVCardMainPresenter >> newCMToolbar [
 		  yourself
 ]
 
+{ #category : 'callbacks' }
+ICVCardMainPresenter >> processimportContactsFileSelection: fileSelection [
+	"Callback for processing import selection in fileSelection. Answer how many contacts were imported"
+
+	^ self vcardManager processimportContactsFileSelection: fileSelection.
+]
+
 { #category : 'initialization' }
 ICVCardMainPresenter >> refresh [ 
 
@@ -181,8 +181,16 @@ ICVCardMainPresenter >> refresh [
 ICVCardMainPresenter >> removeContact [
 
 	(self confirm: 'Are you sure you want to remove the contact ?')
-		ifFalse: [ ^ self ].
-	contactListPresenter removeContact
+		ifTrue: [ contactListPresenter removeContact ].
+	
+]
+
+{ #category : 'accessing' }
+ICVCardMainPresenter >> selectFile [ 
+	"Open a modal window to select a file, and answer the selection result, or nil if cancelled"
+
+	^ StOpenFilePresenter new openModal
+
 ]
 
 { #category : 'layout' }
