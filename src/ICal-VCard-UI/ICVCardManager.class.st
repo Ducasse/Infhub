@@ -46,7 +46,7 @@ ICVCardManager class >> initialize [
 	self uniqueInstance reset
 ]
 
-{ #category : 'instance creation' }
+{ #category : 'class initialization' }
 ICVCardManager class >> reset [
 	<script>
 	
@@ -88,22 +88,26 @@ ICVCardManager >> contacts [
 ]
 
 { #category : 'actions' }
-ICVCardManager >> importContact [
-
-	| contactsImported file |
-	file := self selectFile.
-	contactsImported := OrderedCollection new.
-	(file extension = 'ston' ) ifTrue: [ contactsImported := self readContactSton:
-		                    (file asFileReference )].
+ICVCardManager >> processimportContactsFileSelection: aCollection [ 
+	"Callback for processing import selection in aCollection. Answer how many contacts were imported"
 	
-
-	contactsImported do: [ :contact | self addContact: contact ]
+	| importCount |
+	
+	importCount := 0.
+	aCollection 
+		select: [ : selectedFile | selectedFile extension = 'ston' ]
+		thenDo: [ : selectedFile |
+			(self readContactSton: selectedFile asFileReference)
+				do: [ :contact | 
+					importCount := importCount + 1.
+					self addContact: contact ] ].
+	^ importCount
+	
 ]
 
 { #category : 'writing' }
 ICVCardManager >> readContactSton: aContactSton [
 
-	
 	^ STON reader
 		  on: aContactSton readStream;
 		  next
@@ -129,15 +133,6 @@ ICVCardManager >> saveContactInSton [
 		STON writer
 			on: stream;
 			nextPut: (self contacts do: [ :each | each saveContactInSton ]) ] 
-]
-
-{ #category : 'accessing' }
-ICVCardManager >> selectFile [ 
-
-	| selectedFile |
-	((selectedFile := StOpenFilePresenter new openModal) notNil and: [
-		 selectedFile isFile ])
-	ifTrue: [ ^ selectedFile ]
 ]
 
 { #category : 'accessing' }

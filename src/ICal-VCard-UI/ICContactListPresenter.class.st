@@ -33,6 +33,28 @@ ICContactListPresenter >> addContact [
 	
 ]
 
+{ #category : 'commands' }
+ICContactListPresenter >> contactListCmdGroup [
+
+	^ CmCommandGroup forSpec
+		  beRoot;
+		  register:
+			  ((CmCommandGroup named: 'contact manager commands') asSpecGroup
+				   register: ((ICAddVCardCommand forSpecContext: self)
+						    name: 'Add Contact';
+						    iconName: #smallAdd;
+						    shortcutKey: $A;
+						    yourself);
+				   register: ((ICRemoveVCardCommand forSpecContext: self)
+						    name: 'Remove contact';
+						    iconName: #smallDelete;
+						    shortcutKey: $B;
+						    yourself);
+				   beDisplayedAsGroup;
+				   yourself);
+		  yourself
+]
+
 { #category : 'operations' }
 ICContactListPresenter >> createNewContact [
 
@@ -61,7 +83,7 @@ ICContactListPresenter >> defaultLayout [
 		  yourself
 ]
 
-{ #category : 'initialization' }
+{ #category : 'private' }
 ICContactListPresenter >> emailAddressesFor: contact [
 
 	^ contact emailAddresses
@@ -70,46 +92,51 @@ ICContactListPresenter >> emailAddressesFor: contact [
 			ifNotEmpty: [ acc,  ', ' , n address ]  ]
 ]
 
-{ #category : 'operations' }
+{ #category : 'initialization' }
 ICContactListPresenter >> initialExtentForWindow [
 
 	^ (840 @ 80) scaledByDisplayScaleFactor
 ]
 
 { #category : 'initialization' }
+ICContactListPresenter >> initializeContactListColumns [
+
+	contactList
+		addColumn: (SpStringTableColumn new
+				 title: 'Fullname';
+				 evaluated: [ :e | e fullname ];
+				 yourself);
+		addColumn: (SpStringTableColumn new
+				 title: 'Number(s)';
+				 evaluated: [ :contact | self phoneNumbersFor: contact ];
+				 yourself);
+		addColumn: (SpStringTableColumn new
+				 title: 'Address';
+				 evaluated: [ :contact | contact addresses joinUsing: ',' ];
+				 yourself);
+		addColumn: (SpStringTableColumn new
+				 title: 'Email';
+				 evaluated: [ :contact | self emailAddressesFor: contact ];
+				 yourself);
+		addColumn: (SpStringTableColumn new
+				 title: 'Birthday';
+				 evaluated: #birthday;
+				 yourself)
+]
+
+{ #category : 'initialization' }
 ICContactListPresenter >> initializePresenters [
 
-	contactList := self newTable
-		               addColumn: (SpStringTableColumn new
-				                title: 'Fullname';
-				                evaluated: [ :e | e fullname ];
-				                yourself);
-		               addColumn: (SpStringTableColumn new
-				                title: 'Number(s)';
-				                evaluated: [ :contact |
-					                self phoneNumbersFor: contact ];
-				                yourself);
-		               addColumn: (SpStringTableColumn new
-				                title: 'Address';
-				                evaluated: [ :contact |
-					                contact addresses joinUsing: ',' ];
-				                yourself);
-		               addColumn: (SpStringTableColumn new
-				                title: 'Email';
-				                evaluated: [ :contact |
-					                self emailAddressesFor: contact ];
-				                yourself);
-		               addColumn: (SpStringTableColumn new
-				                title: 'Birthday';
-				                evaluated: #birthday;
-				                yourself);
-		               contextMenu: [
-			               (self rootCommandsGroup / 'contact manager commands')
-				               beRoot asMenuPresenter ];
-		               whenSelectedItemChangedDo: [ :selection |
-		               self owner updateDetail: selection ];
-		               items: self vcardManager contacts;
-		               yourself
+	| cmdGroup |
+	
+	cmdGroup := self contactListCmdGroup.
+	contactList := self newTable.
+	self initializeContactListColumns.
+	contactList
+		contextMenu: [ cmdGroup asMenuPresenter ];
+		contextKeyBindings: (self keybindsForFromContextMenu: cmdGroup);
+		whenSelectedItemChangedDo: [ :selection | self owner updateDetail: selection ];
+		items: self vcardManager contacts
 ]
 
 { #category : 'initialization' }
@@ -126,13 +153,39 @@ ICContactListPresenter >> items: aCollection [
 	contactList items: aCollection
 ]
 
-{ #category : 'initialization' }
+{ #category : 'private' }
+ICContactListPresenter >> keybindsForFromContextMenu: aGroupElement [
+	| keybinds keybindsCommands |
+	keybinds := KMCategory new.
+
+	keybindsCommands := aGroupElement allCommands select: [ :aCommand | aCommand hasShortcutKey ].
+
+	keybindsCommands do: [ :aCommand | | action |
+		action := [ :aSelectedElement | aCommand execute ].
+		keybinds addKeymapEntry: (KMKeymap
+			shortcut: aCommand shortcutKey
+			action: action).
+		].
+
+	^ keybinds
+]
+
+{ #category : 'private' }
 ICContactListPresenter >> phoneNumbersFor: contact [
 
 	^ contact phoneNumbers 
 		  inject: String empty
-		  into: [ :acc :n | acc ifEmpty: [n number]
-			ifNotEmpty: [ acc,  ', ' , n number ]  ]
+		  into: [ :acc :n | 
+			| phoneNumberString |
+			phoneNumberString := n number asString.
+			acc 
+				ifEmpty: [ phoneNumberString ]
+				ifNotEmpty: [ 
+					String streamContents: [ : stream | 
+						stream 
+							<< acc;
+							<< ', ';
+							<< phoneNumberString ] ] ]
 ]
 
 { #category : 'operations' }
@@ -157,8 +210,8 @@ ICContactListPresenter >> updateItems [
 	self updatePresenter
 ]
 
-{ #category : 'operations' }
+{ #category : 'accessing' }
 ICContactListPresenter >> vcardManager [
 
-		^ ICVCardManager uniqueInstance
+	^ ICVCardManager uniqueInstance
 ]

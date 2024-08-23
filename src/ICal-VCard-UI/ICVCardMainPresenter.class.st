@@ -20,17 +20,6 @@ Class {
 	#tag : 'Spec'
 }
 
-{ #category : 'commands' }
-ICVCardMainPresenter class >> buildCommandsGroupWith: presenter forRoot: rootCommandGroup [
-
-	rootCommandGroup
-		register:
-			((CmCommandGroup named: 'contact manager commands') asSpecGroup
-				register: ICAddVCardCommand forSpec;
-				register: ICRemoveVCardCommand forSpec;
-				yourself)
-]
-
 { #category : 'operations' }
 ICVCardMainPresenter >> clickFilmAtIndex: anIndex [
 
@@ -68,11 +57,15 @@ ICVCardMainPresenter >> detailOfContact [
 	^ detailOfContactPresenter 
 ]
 
-{ #category : 'initialization' }
+{ #category : 'callbacks' }
 ICVCardMainPresenter >> importContact [
 
-	self contactList vcardManager importContact.
-	(self alert: 'Contact(s) imported')
+	self selectFile 
+		ifNotNil: [ : fileSelection | 
+			| importCount |
+			importCount := self processimportContactsFileSelection: fileSelection.
+			self alert: importCount asString , ' contact(s) imported' ]
+		ifNil: [ self inform: 'Cancelled' ]
 	
 ]
 
@@ -128,7 +121,7 @@ ICVCardMainPresenter >> initializeWindow: aWindowPresenter [
 		toolbar: self newCMToolbar
 ]
 
-{ #category : 'initialization' }
+{ #category : 'accessing' }
 ICVCardMainPresenter >> model [
 
 	^ self application vcardManager
@@ -171,6 +164,13 @@ ICVCardMainPresenter >> newCMToolbar [
 		  yourself
 ]
 
+{ #category : 'callbacks' }
+ICVCardMainPresenter >> processimportContactsFileSelection: fileSelection [
+	"Callback for processing import selection in fileSelection. Answer how many contacts were imported"
+
+	^ self vcardManager processimportContactsFileSelection: fileSelection.
+]
+
 { #category : 'initialization' }
 ICVCardMainPresenter >> refresh [ 
 
@@ -181,8 +181,16 @@ ICVCardMainPresenter >> refresh [
 ICVCardMainPresenter >> removeContact [
 
 	(self confirm: 'Are you sure you want to remove the contact ?')
-		ifFalse: [ ^ self ].
-	contactListPresenter removeContact
+		ifTrue: [ contactListPresenter removeContact ].
+	
+]
+
+{ #category : 'accessing' }
+ICVCardMainPresenter >> selectFile [ 
+	"Open a modal window to select a file, and answer the selection result, or nil if cancelled"
+
+	^ StOpenFilePresenter new openModal
+
 ]
 
 { #category : 'layout' }
